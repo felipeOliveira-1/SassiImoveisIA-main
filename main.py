@@ -4,20 +4,19 @@ import json
 
 app = FastAPI()
 
+# Base directory inside your project where the 'imoveis' folder is located.
 base_dir = "sassiImoveisIA-main"
 
-@app.get("/{transaction_type}/{id}/")
-async def read_imovel(transaction_type: str, id: str):
-    if transaction_type not in ["imoveis_locacao", "imoveis_venda"]:
-        raise HTTPException(status_code=404, detail="Transaction type not found")
-    
-    file_path = os.path.join(base_dir, transaction_type, id, f"{id}.json")
-    
-    if not os.path.exists(file_path):
-        print("File path attempted:", file_path)  # Log the attempted file path
-        raise HTTPException(status_code=404, detail=f"File not found at {file_path}")  # Include the file path in the error
-    
-    with open(file_path, 'r', encoding='utf-8') as file:
+@app.get("/{transaction_type}/{dir_name}/{file_name}")
+async def read_imovel(transaction_type: str, dir_name: str, file_name: str):
+    # Construct the full path to the file
+    full_path = os.path.join(base_dir, transaction_type, dir_name, file_name)
+
+    # Check if the file exists, if not, return a 404 error
+    if not os.path.exists(full_path):
+        return {"error": "File not found", "path": full_path}
+
+    # Open and read the JSON file, then return its contents
+    with open(full_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
-    
     return data
