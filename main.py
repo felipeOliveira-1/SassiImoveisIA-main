@@ -20,3 +20,15 @@ async def read_imovel(transaction_type: str, dir_name: str, file_name: str):
     with open(full_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
     return data
+
+@app.get("/debug-file/{transaction_type}/{dir_name}/{file_name}")
+async def debug_file_content(transaction_type: str, dir_name: str, file_name: str):
+    base_dir = "sassiImoveisIA-main"
+    file_path = os.path.join(base_dir, transaction_type, dir_name, file_name)
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+        return {"content": content}
+    except FileNotFoundError:
+        return {"error": "File not found"}
+
