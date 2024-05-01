@@ -31,13 +31,14 @@ class ContentItem(BaseModel):
     destaque: str
     fotos: Union[List[HttpUrl], HttpUrl] 
 
-# Assuming casa_locacao is the main category like 'imoveis_locacao'
-@app.get("/casa_locacao/{file_name}")
-async def read_imovel(file_name: str):
-    full_path = os.path.join("casa_locacao", file_name)
+base_dir = "C:\\Users\\kabba\\Downloads\\sassi"  # Adjust based on your setup
+
+@app.get("/{category}/{file_name}")
+async def read_imovel(category: str, file_name: str):
+    full_path = os.path.join(base_dir, category, file_name)  # Updated to include base_dir
     if not os.path.exists(full_path):
         return {"error": "File not found", "path": full_path}
-
+    
     try:
         with open(full_path, 'r', encoding='utf-8') as file:
             data = json.load(file)
@@ -45,5 +46,6 @@ async def read_imovel(file_name: str):
         return [item.dict() for item in content_items]
     except Exception as e:
         return {"error": "Error parsing JSON", "message": str(e)}
+
 
 
