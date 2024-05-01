@@ -31,7 +31,7 @@ class ContentItem(BaseModel):
     destaque: str
     fotos: Union[List[HttpUrl], HttpUrl] 
 
-base_dir = "C:\\Users\\kabba\\Downloads\\sassi"  # Adjust based on your setup
+base_dir = "."  # Adjust based on your setup
 
 @app.get("/{category}/{file_name}")
 async def read_imovel(category: str, file_name: str):
