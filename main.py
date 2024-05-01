@@ -14,7 +14,8 @@ async def read_imovel(transaction_type: str, id: str):
     file_path = os.path.join(base_dir, transaction_type, id, f"{id}.json")
     
     if not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail="File not found")
+        print("File path attempted:", file_path)  # Log the attempted file path
+        raise HTTPException(status_code=404, detail=f"File not found at {file_path}")  # Include the file path in the error
     
     with open(file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
