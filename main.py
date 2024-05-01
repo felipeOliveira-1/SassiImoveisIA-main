@@ -1,8 +1,10 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 import os
 import json
-
+from pydantic import BaseModel
+from typing import List, Union
+from pydantic import BaseModel, HttpUrl
+from typing import List
 
 app = FastAPI()
 
@@ -17,7 +19,7 @@ class ContentItem(BaseModel):
     area: float
     valor_condominio: float
     descricao: str
-    Detalhes: list
+    Detalhes: List[str]
     bairro: str
     cidade: str
     cep: str
@@ -27,17 +29,21 @@ class ContentItem(BaseModel):
     cozinha: int
     vagas_garagem: int
     destaque: str
-    fotos: list
+    fotos: Union[List[HttpUrl], HttpUrl] 
 
-base_dir = "sassiImoveisIA-main"
-
-@app.get("/{transaction_type}/{dir_name}/{file_name}")
-async def read_imovel(transaction_type: str, dir_name: str, file_name: str):
-    full_path = os.path.join(base_dir, transaction_type, dir_name, file_name)
+# Assuming casa_locacao is the main category like 'imoveis_locacao'
+@app.get("/casa_locacao/{file_name}")
+async def read_imovel(file_name: str):
+    full_path = os.path.join("casa_locacao", file_name)
     if not os.path.exists(full_path):
         return {"error": "File not found", "path": full_path}
 
-    with open(full_path, 'r', encoding='utf-8') as file:
-        data = json.load(file)
-        content_item = ContentItem(**data)
-        return content_item.dict()
+    try:
+        with open(full_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+        content_items = [ContentItem(**item) for item in data]
+        return [item.dict() for item in content_items]
+    except Exception as e:
+        return {"error": "Error parsing JSON", "message": str(e)}
+
+
